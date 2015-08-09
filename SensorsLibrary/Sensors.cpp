@@ -44,7 +44,6 @@ void   Sensors::setup(uint8_t id)
     }
 #endif
 #ifdef Sensors_enableTSL
-    //setTime(12,30,30,18,6,2015);
     if (tsl.begin()) {
         uint32_t lum = tsl.getFullLuminosity();
         if (lum != 0xffffffff) {
@@ -60,7 +59,6 @@ void   Sensors::setup(uint8_t id)
         bitWrite(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT,true);
     }
     _humidityDHT = dht.readHumidity();
-    //delay(1000);
     if (!isnan(_humidityDHT) && !isnan(_temperatureDHT)) {
         bitWrite(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT,true);
     }
