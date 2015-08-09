@@ -1,0 +1,79 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		0EF42AAD1B399AB700F2E270 /* rsync.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = rsync.sh; sourceTree = "<group>"; };
+		0EFE94311B3878EF00A3A900 /* Sensors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Sensors.cpp; path = SensorsLibrary/Sensors.cpp; sourceTree = "<group>"; };
+		0EFE94321B3878EF00A3A900 /* Sensors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sensors.h; path = SensorsLibrary/Sensors.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0E2F6AE71B38782F003DF033 = {
+			isa = PBXGroup;
+			children = (
+				0EF42AAD1B399AB700F2E270 /* rsync.sh */,
+				0EFE94311B3878EF00A3A900 /* Sensors.cpp */,
+				0EFE94321B3878EF00A3A900 /* Sensors.h */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		0E2F6AE81B38782F003DF033 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0640;
+			};
+			buildConfigurationList = 0E2F6AEB1B38782F003DF033 /* Build configuration list for PBXProject "Sensors" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 0E2F6AE71B38782F003DF033;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		0E2F6AE91B38782F003DF033 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		0E2F6AEA1B38782F003DF033 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0E2F6AEB1B38782F003DF033 /* Build configuration list for PBXProject "Sensors" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E2F6AE91B38782F003DF033 /* Debug */,
+				0E2F6AEA1B38782F003DF033 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0E2F6AE81B38782F003DF033 /* Project object */;
+}
