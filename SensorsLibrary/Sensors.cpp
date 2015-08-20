@@ -35,7 +35,7 @@ void   Sensors::setup(uint8_t id)
 #ifdef Sensors_enableRTC
     setSyncProvider(RTC.get);   // the function to get the time from the RTC
     if(timeStatus() != timeSet) {
-        Serial.println("Unable to sync with the RTC");
+        Serial.println("S:E01");
     } else {
 #ifdef Sensors_temperatureRTC
         bitWrite(_status,SENSORS_TEMPERATURE_RTC_SETUP_BIT,true);
@@ -419,7 +419,7 @@ void Sensors::loopTemperatureDHT()
 #ifdef Sensors_dewPoint
     if(!isnan(_humidityDHT))
         _dewpoint = dewPoint(_temperatureDHT,_humidityDHT);
-#endif
+#endif Sensors_dewPoint
 }
 
 void Sensors::loopHumidityDHT()
@@ -430,16 +430,16 @@ void Sensors::loopHumidityDHT()
 #ifdef Sensors_dewPoint
     if(!isnan(_temperatureDHT))
         _dewpoint = dewPoint(_temperatureDHT,_humidityDHT);
-#endif
+#endif Sensors_dewPoint
 
 }
-#endif
+#endif Sensors_enableDHT
 
 #ifdef Sensors_dewPoint
 void Sensors::loopDewPoint()
 {
 }
-#endif
+#endif Sensors_dewPoint
 
 #ifdef Sensors_enableTSL
 void Sensors::loopLight()
@@ -457,7 +457,7 @@ void Sensors::loopLight()
         _visible = 0;
     }
 }
-#endif
+#endif Sensors_enableTSL
 
 #ifdef Sensors_enableBMP
 void Sensors::loopBMP()
@@ -466,9 +466,9 @@ void Sensors::loopBMP()
     _pressure = bmp.getPressure();
 #ifdef Sensors_temperatureBMP
     _temperatureBMP = bmp.getTemperature();
-#endif
+#endif Sensors_temperatureBMP
 }
-#endif
+#endif Sensors_enableBMP
 
 #ifdef Sensors_enableRTC
 String  Sensors::stringTime()
@@ -534,8 +534,8 @@ String Sensors::stringTemperatureRTC()
     }
     return text;
 }
-#endif
-#endif
+#endif Sensors_temperatureRTC
+#endif Sensors_enableRTC
 
 #ifdef Sensors_enableDHT
 String Sensors::stringTemperatureDHT()
@@ -559,7 +559,7 @@ String Sensors::stringHumidityDHT()
     }
     return text;
 }
-#endif
+#endif Sensors_enableDHT
 
 #ifdef Sensors_dewPoint
 string Sensors::stringDewpoint()
@@ -572,7 +572,7 @@ string Sensors::stringDewpoint()
     }
     return text;
 }
-#endif
+#endif Sensors_dewPoint
 
 #ifdef Sensors_enableTSL
 String Sensors::stringLight()
@@ -588,7 +588,7 @@ String Sensors::stringLight()
     text += _full;
     return text;
 }
-#endif
+#endif Sensors_enableTSL
 
 #ifdef Sensors_enableBMP
 String Sensors::stringBMP()
@@ -600,12 +600,12 @@ String Sensors::stringBMP()
         text += _temperatureBMP;
         text += "C (BMP)";
     }
-#endif
+#endif Sensors_temperatureBMP
     text += ", Press:";
     text += (float)_pressure/100;
     return text;
 }
-#endif
+#endif Sensors_enableBMP
 
 #ifdef Sensors_print
 void Sensors::printStatus()
@@ -620,8 +620,9 @@ void Sensors::printStatus()
         Serial.print(stringTemperatureRTC());
         Serial.print(" (RTC)");
     }
-#endif
-#endif
+#endif Sensors_temperatureRTC
+#endif Sensors_enableRTC
+    
 #ifdef Sensors_enableDHT
     if (bitRead(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT)) {
         Serial.print(", ");
@@ -632,7 +633,8 @@ void Sensors::printStatus()
         Serial.print(", ");
         Serial.print(stringHumidityDHT());
     }
-#endif
+#endif Sensors_enableDHT
+    
 #ifdef Sensors_dewPoint
     if (bitRead(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT) && bitRead(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT)) {
         Serial.print(stringDewpoint());
@@ -642,20 +644,20 @@ void Sensors::printStatus()
     if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
         Serial.print(stringLight());
     }
-#endif
+#endif Sensors_enableTSL
 #ifdef Sensors_enableBMP
     if (bitRead(_status,SENSORS_BMP_SETUP_BIT)) {
         Serial.print(stringBMP());
     }
-#endif
+#endif Sensors_enableBMP
     Serial.println();
 #ifdef __AVR_ATmega32U4__
     if (Serial1) {
         Serial1.println();
     }
-#endif
+#endif __AVR_ATmega32U4__
 }
-#endif
+#endif Sensors_print
 
 #ifdef Sensors_dewPoint
 // dewPoint function NOAA
@@ -692,6 +694,6 @@ double Sensors::dewPoint(double celsius, double humidity)
     double Td = (b * temp) / (a - temp);
     return Td;
 }
-#endif
-#endif
+#endif Sensors_dewPointFast
+#endif Sensors_dewPoint
 

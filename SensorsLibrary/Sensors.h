@@ -12,7 +12,7 @@
 #define Sensors_h
 #include <Time.h>
 #include <Wire.h>
-#include <DS3232RTC.h>
+#include <JRTC.h>
 #include <DHT.h>
 
 #if ARDUINO >= 100
