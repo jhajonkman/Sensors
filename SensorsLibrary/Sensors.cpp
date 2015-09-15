@@ -107,7 +107,7 @@ void Sensors::loop(Relays *relays)
 #endif
 #ifdef Sensors_enableTSL
         if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
-            relays->setLight(_lux);
+            relays->setLight(_ir);
         }
 #endif
     }
