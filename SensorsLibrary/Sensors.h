@@ -119,29 +119,29 @@ public:
 #ifdef Sensors_xbee
     uint8_t putXBeeData(ByteBuffer *buffer);
 #ifdef Sensors_enableRTC
-    uint8_t putXBeeTime(ByteBuffer *buffer);
+    void putXBeeTime(ByteBuffer *buffer);
 #ifdef Sensors_temperatureRTC
-    uint8_t putXBeeTemperatureRTC(ByteBuffer *buffer);
+    void putXBeeTemperatureRTC(ByteBuffer *buffer);
 #endif
 #endif
 #ifdef Sensors_enableDHT
-    uint8_t putXBeeTemperatureDHT(ByteBuffer *buffer);
+    void putXBeeTemperatureDHT(ByteBuffer *buffer);
 #endif
 #ifdef Sensors_temperatureBMP
-    uint8_t putXBeeTemperatureBMP(ByteBuffer *buffer);
+    void putXBeeTemperatureBMP(ByteBuffer *buffer);
 #endif
-    uint8_t putXBeeHumidityDHT(ByteBuffer *buffer);
+    void putXBeeHumidityDHT(ByteBuffer *buffer);
 #ifdef Sensors_enableTSL
-    uint8_t putXBeeLux(ByteBuffer *buffer);
-    uint8_t putXBeeIr(ByteBuffer *buffer);
-    uint8_t putXBeeVisible(ByteBuffer *buffer);
-    uint8_t putXBeeFull(ByteBuffer *buffer);
+    void putXBeeLux(ByteBuffer *buffer);
+    void putXBeeIr(ByteBuffer *buffer);
+    void putXBeeVisible(ByteBuffer *buffer);
+    void putXBeeFull(ByteBuffer *buffer);
 #endif
 #ifdef Sensors_enableBMP
-    uint8_t putXBeePressure(ByteBuffer *buffer);
+    void putXBeePressure(ByteBuffer *buffer);
 #endif
 #ifdef Sensors_dewPoint
-    uint8_t putXBeeDewPoint(ByteBuffer *buffer);
+    void putXBeeDewPoint(ByteBuffer *buffer);
 #endif
 #endif //Sensors_xbee
 #ifdef Sendors_status
@@ -202,9 +202,9 @@ private:
 #endif
     
 #ifdef Sensors_xbee
-    uint8_t     putXBeeInt(ByteBuffer *buffer, uint8_t sensor, int value);
+    void     putXBeeInt(ByteBuffer *buffer, uint8_t sensor, int value);
     //uint8_t     putXBeeFloat(ByteBuffer *buffer, uint8_t sensor, float value);
-    uint8_t     putXBeeLong(ByteBuffer *buffer, uint8_t sensor, long value);
+    void     putXBeeLong(ByteBuffer *buffer, uint8_t sensor, long value);
 #endif
     
 #ifdef Sensors_enableRTC

@@ -96,10 +96,15 @@ bool Sensors::isSetup()
 void Sensors::loop(Relays *relays)
 {
     loop();
+#ifdef Sensors_enableDHT
     if (relays->isSetup()) {
         if (bitRead(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT)) {
             relays->setTemperature(_temperatureDHT);
         }
+        if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
+            relays->setHumidity(_humidityDHT);
+        }
+#endif
 #ifdef Sensors_enableTSL
         if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
             relays->setLight(_lux);
@@ -255,76 +260,73 @@ uint8_t Sensors::putXBeeData(ByteBuffer *buffer)
 }
 
 #ifdef Sensors_enableRTC
-uint8_t Sensors::putXBeeTime(ByteBuffer *buffer)
+void Sensors::putXBeeTime(ByteBuffer *buffer)
 {
     if (buffer->getFreeSize() >= 5) {
-        if(!buffer->put(XBEE_TIME_HEADER)) {
-            return 0;
-        }
-        return buffer->putTime(_lastTime);
+        buffer->put(XBEE_TIME_HEADER);
+        buffer->putTime(_lastTime);
     }
-    return 0;
 }
 
 #ifdef Sensors_temperatureRTC
-uint8_t Sensors::putXBeeTemperatureRTC(ByteBuffer *buffer)
+void Sensors::putXBeeTemperatureRTC(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_TEMPERATURE_HEADER | 0x01, (int)_temperatureRTC*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_TEMPERATURE_HEADER | 0x01, (int)_temperatureRTC*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 #endif
 #endif
 
 #ifdef Sensors_enableDHT
-uint8_t Sensors::putXBeeTemperatureDHT(ByteBuffer *buffer)
+void Sensors::putXBeeTemperatureDHT(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_TEMPERATURE_HEADER | 0x02, _temperatureDHT*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_TEMPERATURE_HEADER | 0x02, _temperatureDHT*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 
-uint8_t Sensors::putXBeeHumidityDHT(ByteBuffer *buffer)
+void Sensors::putXBeeHumidityDHT(ByteBuffer *buffer)
 {
     return putXBeeInt(buffer, XBEE_HUMIDITY_HEADER | 0x01, _humidityDHT*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 #endif
 
 #ifdef Sensors_enableTSL
-uint8_t Sensors::putXBeeLux(ByteBuffer *buffer)
+void Sensors::putXBeeLux(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_LUX_HEADER | 0x01, _lux*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_LUX_HEADER | 0x01, _lux*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 
-uint8_t Sensors::putXBeeIr(ByteBuffer *buffer)
+void Sensors::putXBeeIr(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_IR_HEADER | 0x01, _ir*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_IR_HEADER | 0x01, _ir*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 
-uint8_t Sensors::putXBeeVisible(ByteBuffer *buffer)
+void Sensors::putXBeeVisible(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_VISIBLE_HEADER | 0x01, _visible*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_VISIBLE_HEADER | 0x01, _visible*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 
-uint8_t Sensors::putXBeeFull(ByteBuffer *buffer)
+void Sensors::putXBeeFull(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_FULL_HEADER | 0x01, _full*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_FULL_HEADER | 0x01, _full*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 #endif
 
 #ifdef Sensors_enableBMP
 #ifdef Sensors_temperatureBMP
-uint8_t Sensors::putXBeeTemperatureBMP(ByteBuffer *buffer)
+void Sensors::putXBeeTemperatureBMP(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_TEMPERATURE_HEADER | 0x03, _temperatureBMP*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_TEMPERATURE_HEADER | 0x03, _temperatureBMP*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 #endif
-uint8_t Sensors::putXBeePressure(ByteBuffer *buffer)
+void Sensors::putXBeePressure(ByteBuffer *buffer)
 {
-    return putXBeeLong(buffer, XBEE_PRESSURE_HEADER | 0x01, (long)_pressure);
+    putXBeeLong(buffer, XBEE_PRESSURE_HEADER | 0x01, (long)_pressure);
 }
 #endif
 
 #ifdef Sensors_dewPoint
-uint8_t Sensors::putXBeeDewPoint(ByteBuffer *buffer)
+void Sensors::putXBeeDewPoint(ByteBuffer *buffer)
 {
-    return putXBeeInt(buffer, XBEE_DEWPOINT_HEADER | 0x01, _dewpoint*SENSORS_FLOAT_TO_INT_MULTIPLY);
+    putXBeeInt(buffer, XBEE_DEWPOINT_HEADER | 0x01, _dewpoint*SENSORS_FLOAT_TO_INT_MULTIPLY);
 }
 #endif
 
@@ -349,6 +351,7 @@ String Sensors::getStatus()
     status += "\n";
 #endif
 #ifdef Sensors_enableTSL
+    status += stringLight();
 #endif
     return status;
 }
@@ -356,42 +359,22 @@ String Sensors::getStatus()
 
 #ifdef Sensors_xbee
 
-uint8_t Sensors::putXBeeInt(ByteBuffer *buffer, uint8_t sensor, int value)
+void Sensors::putXBeeInt(ByteBuffer *buffer, uint8_t sensor, int value)
 {
-    if (buffer->getFreeSize() >= 5) {
-        if(buffer->put(XBEE_SENSOR_HEADER)) {
-            if(buffer->put(sensor)) {
-                return buffer->putInt(value);
-            }
-        }
+    if(buffer->getFreeSize() >= 5) {
+        buffer->put(XBEE_SENSOR_HEADER);
+        buffer->put(sensor);
+        buffer->putInt(value);
     }
-    return 0;
 }
 
-/*
-uint8_t Sensors::putXBeeFloat(ByteBuffer *buffer, uint8_t sensor, float value)
+void Sensors::putXBeeLong(ByteBuffer *buffer, uint8_t sensor, long value)
 {
     if (buffer->getFreeSize() >= 5) {
-        if(buffer->put(XBEE_SENSOR_HEADER)) {
-            if(buffer->put(sensor)) {
-                return buffer->putFloat(value);
-            }
-        }
+        buffer->put(XBEE_SENSOR_HEADER);
+        buffer->put(sensor);
+        buffer->putLong(value);
     }
-    return 0;
-}
-*/
-
-uint8_t Sensors::putXBeeLong(ByteBuffer *buffer, uint8_t sensor, long value)
-{
-    if (buffer->getFreeSize() >= 5) {
-        if(buffer->put(XBEE_SENSOR_HEADER)) {
-            if(buffer->put(sensor)) {
-                return buffer->putLong(value);
-            }
-        }
-    }
-    return 0;
 }
 
 #endif
