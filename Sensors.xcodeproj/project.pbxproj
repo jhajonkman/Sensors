@@ -28,7 +28,7 @@
 		0E2F6AE81B38782F003DF033 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0640;
+				LastUpgradeCheck = 0710;
 			};
 			buildConfigurationList = 0E2F6AEB1B38782F003DF033 /* Build configuration list for PBXProject "Sensors" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -50,6 +50,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;

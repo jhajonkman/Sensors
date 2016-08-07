@@ -29,7 +29,7 @@
 //#define Sensors_dewPoint
 //#define Sensors_dewPointFast
 //#define Sensors_print
-//#define Sendors_status
+#define Sendors_status
 #define Sensors_xbee
 #define Sensors_Relays
 #define Sensors_enableRTC

@@ -96,23 +96,25 @@ bool Sensors::isSetup()
 void Sensors::loop(Relays *relays)
 {
     loop();
-#ifdef Sensors_enableDHT
     if (relays->isSetup()) {
+#ifdef Sensors_enableDHT
         if (bitRead(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT)) {
             relays->setTemperature(_temperatureDHT);
         }
+#ifdef RelayTask_Humidity
         if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
             relays->setHumidity(_humidityDHT);
         }
-#endif
+#endif RelayTask_Humidity
+#endif Sensors_enableDHT
 #ifdef Sensors_enableTSL
         if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
-            relays->setLight(_ir);
+            relays->setLight(min(min(_ir,_lux),_visible));
         }
-#endif
+#endif Sensors_enableTSL
     }
 }
-#endif
+#endif Sensors_Relays
 
 void Sensors::loop()
 {
@@ -337,21 +339,31 @@ String Sensors::getStatus()
 {
     String status = "";
 #ifdef Sensors_enableRTC
-    status += stringTime();
-    status += "\n";
+    if ( bitRead(_status,SENSORS_TIME_SETUP_BIT)) {
+        status += stringTime();
+        status += "\n";
+    }
 #ifdef Sensors_temperatureRTC
-    status += stringTemperatureRTC();
-    status += "\n";
+    if (bitRead(_status,SENSORS_TEMPERATURE_RTC_SETUP_BIT)) {
+        status += stringTemperatureRTC();
+        status += "\n";
+    }
 #endif
 #endif
 #ifdef Sensors_enableDHT
-    status += stringTemperatureDHT();
-    status += "\n";
-    status += stringHumidityDHT();
-    status += "\n";
+    if (bitRead(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT)) {
+        status += stringTemperatureDHT();
+        status += "\n";
+    }
+    if (bitRead(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT)) {
+        status += stringHumidityDHT();
+        status += "\n";
+    }
 #endif
 #ifdef Sensors_enableTSL
-    status += stringLight();
+    if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
+        status += stringLight();
+    }
 #endif
     return status;
 }
@@ -561,7 +573,7 @@ string Sensors::stringDewpoint()
 String Sensors::stringLight()
 {
     String text = "";
-    text += ", Lux:";
+    text += "Lux:";
     text += _lux;
     text += ", IR:";
     text += _ir;
