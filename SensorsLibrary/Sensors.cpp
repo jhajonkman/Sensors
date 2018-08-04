@@ -62,7 +62,7 @@ void   Sensors::setup(uint8_t id)
             }
             
             delay(400); // Cold start delay (Uno)
-            float temperatureDHT = dht.readTemperature();
+            float temperatureDHT = readTemperature();
             if (!isnan(temperatureDHT)) {
                 _temperatureDHT = temperatureDHT;
                 bitWrite(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT,true);
@@ -70,7 +70,7 @@ void   Sensors::setup(uint8_t id)
         }
         if (!bitRead(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT)) {
             delay(400); // Cold start delay (Uno)
-            float humidityDHT = dht.readHumidity();
+            float humidityDHT = readHumidity();
             if (!isnan(humidityDHT) && !isnan(_temperatureDHT)) {
                 _humidityDHT = humidityDHT;
                 bitWrite(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT,true);
@@ -443,9 +443,27 @@ void Sensors::loopTemperatureRTC()
 #endif
 
 #ifdef Sensors_enableDHT
+float Sensors::readTemperature() {
+    float temperature = NAN;
+    int retry = 0;
+    do {
+        temperature = dht.readTemperature();
+    } while (isnan(temperature) and retry++ <= DHTRETRY);
+    return temperature;
+}
+
+float Sensors::readHumidity() {
+    float humidity = NAN;
+    int retry = 0;
+    do {
+        humidity = dht.readHumidity();
+    } while (isnan(humidity) and retry++ <= DHTRETRY);
+    return humidity;
+}
+
 void Sensors::loopTemperatureDHT()
 {
-    float temperatureDHT = dht.readTemperature();
+    float temperatureDHT = readTemperature();
     if (!isnan(temperatureDHT) ) {
         _temperatureDHT = temperatureDHT;
     }
@@ -457,7 +475,7 @@ void Sensors::loopTemperatureDHT()
 
 void Sensors::loopHumidityDHT()
 {
-    float humidity = dht.readHumidity();
+    float humidity = readHumidity();
     if( !isnan(humidity) ) {
         _humidityDHT = humidity;
     }

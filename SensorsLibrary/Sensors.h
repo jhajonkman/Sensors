@@ -73,8 +73,11 @@
 
 #define SENSORS_FLOAT_TO_INT_MULTIPLY       100
 
-#define DHTPIN 7
-#define DHTTYPE DHT22   // DHT 22  (AM2302)
+#ifndef DHTPIN
+#define DHTPIN                              7
+#endif
+#define DHTRETRY                            3
+#define DHTTYPE                             DHT22   // DHT 22  (AM2302)
 
 #define XBEE_TIME_HEADER            0x10
 #define XBEE_SENSOR_HEADER          0x40
@@ -198,6 +201,8 @@ private:
 #endif
 #endif
 #ifdef Sensors_enableDHT
+    float       readTemperature();
+    float       readHumidity();
     void        loopTemperatureDHT();
     void        loopHumidityDHT();
 #endif
