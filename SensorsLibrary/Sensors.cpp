@@ -31,6 +31,7 @@ BMP180 bmp;
 
 void   Sensors::setup(uint8_t id)
 {
+    _status = 0;
     _id = id;
 #ifdef Sensors_enableRTC
     setSyncProvider(RTC.get);   // the function to get the time from the RTC
@@ -52,39 +53,63 @@ void   Sensors::setup(uint8_t id)
         }
     }
 #endif
+    uint8_t setuprun = SENSORS_SETUP_RUNS;
+    do {
 #ifdef Sensors_enableDHT
-    dht.begin();
-    delay(400); // Cold start delay (Uno)
-    _temperatureDHT = dht.readTemperature();
-    if (!isnan(_temperatureDHT)) {
-        bitWrite(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT,true);
-    }
-    _humidityDHT = dht.readHumidity();
-    //delay(1000);
-    if (!isnan(_humidityDHT) && !isnan(_temperatureDHT)) {
-        bitWrite(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT,true);
-    }
+        if (!bitRead(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT)) {
+            if (setuprun == SENSORS_SETUP_RUNS){
+                dht.begin();
+            }
+            
+            delay(400); // Cold start delay (Uno)
+            float temperatureDHT = dht.readTemperature();
+            if (!isnan(temperatureDHT)) {
+                _temperatureDHT = temperatureDHT;
+                bitWrite(_status,SENSORS_TEMPERATURE_DHT_SETUP_BIT,true);
+            }
+        }
+        if (!bitRead(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT)) {
+            delay(400); // Cold start delay (Uno)
+            float humidityDHT = dht.readHumidity();
+            if (!isnan(humidityDHT) && !isnan(_temperatureDHT)) {
+                _humidityDHT = humidityDHT;
+                bitWrite(_status,SENSORS_HUMIDITY_DHT_SETUP_BIT,true);
+            }
+        }
 #endif
 #ifdef Sensors_enableTSL
-    if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
-        tsl.setTiming(TSL2561_INTEGRATIONTIME_13MS);
-    }
+        if (setuprun == SENSORS_SETUP_RUNS){
+            if (bitRead(_status,SENSORS_LIGHT_SETUP_BIT)) {
+                tsl.setTiming(TSL2561_INTEGRATIONTIME_13MS);
+            }
+        }
 #endif
 #ifdef Sensors_enableBMP
-    bmp.begin(BMP180_Mode_HighResolution,false);
+        if (setuprun == SENSORS_SETUP_RUNS){
+            bmp.begin(BMP180_Mode_HighResolution,false);
+        }
+        if (!bitRead(_status,SENSORS_BMP_SETUP_BIT)) {
 #ifdef Sensors_temperatureBMP
-    _temperatureBMP = bmp.getTemperature();
-    if (!isnan(_temperatureBMP)) {
-        bitWrite(_status,SENSORS_BMP_SETUP_BIT,true);
-        bitWrite(_status,SENSORS_TEMPERATURE_BMP_SETUP_BIT,true);
-    }
+            float temperatureBMP = bmp.getTemperature();
+            if (!isnan(temperatureBMP)) {
+                _temperatureBMP = temperatureBMP;
+                bitWrite(_status,SENSORS_BMP_SETUP_BIT,true);
+                bitWrite(_status,SENSORS_TEMPERATURE_BMP_SETUP_BIT,true);
+            }
 #else
-    if (!isnan(bmp.getTemperature())) {
-        bitWrite(_status,SENSORS_BMP_SETUP_BIT,true);
-    }
+            float temperatureBMP = bmp.getTemperature();
+            if (!isnan(temperatureBMP)) {
+                _temperatureBMP = temperatureBMP;
+                bitWrite(_status,SENSORS_BMP_SETUP_BIT,true);
+            }
 #endif
+        }
 #endif
+    } while (setuprun-- > 0);
     bitWrite(_status,SENSORS_STATUS_SETUP_BIT,true);
+#ifdef Sensors_reset
+    _save = _status;
+#endif
 }
 
 bool Sensors::isSetup()
@@ -163,6 +188,11 @@ void Sensors::loop()
 #endif
         _last_run += SENSORS_LOOP_CHECK;
         _looper++;
+#ifdef Sensors_reset
+        if (_status != _save ) {
+            reset();
+        }
+#endif
     }
 }
 
@@ -217,6 +247,11 @@ void Sensors::loop()
 
 uint8_t Sensors::putXBeeData(ByteBuffer *buffer)
 {
+#ifdef Sensors_reset
+    if (_status != _save ) {
+        reset();
+    }
+#endif
 #ifdef Sensors_enableRTC
     if ( bitRead(_status,SENSORS_TIME_SETUP_BIT)) {
         putXBeeTime(buffer);
@@ -334,7 +369,7 @@ void Sensors::putXBeeDewPoint(ByteBuffer *buffer)
 
 #endif  //Sensors_xbee
 
-#ifdef Sendors_status
+#ifdef Sensors_status
 String Sensors::getStatus()
 {
     String status = "";
@@ -410,7 +445,10 @@ void Sensors::loopTemperatureRTC()
 #ifdef Sensors_enableDHT
 void Sensors::loopTemperatureDHT()
 {
-    _temperatureDHT = dht.readTemperature();
+    float temperatureDHT = dht.readTemperature();
+    if (!isnan(temperatureDHT) ) {
+        _temperatureDHT = temperatureDHT;
+    }
 #ifdef Sensors_dewPoint
     if(!isnan(_humidityDHT))
         _dewpoint = dewPoint(_temperatureDHT,_humidityDHT);
@@ -420,11 +458,13 @@ void Sensors::loopTemperatureDHT()
 void Sensors::loopHumidityDHT()
 {
     float humidity = dht.readHumidity();
-    if( !isnan(humidity) )
+    if( !isnan(humidity) ) {
         _humidityDHT = humidity;
+    }
 #ifdef Sensors_dewPoint
-    if(!isnan(_temperatureDHT))
+    if(!isnan(_temperatureDHT)) {
         _dewpoint = dewPoint(_temperatureDHT,_humidityDHT);
+    }
 #endif Sensors_dewPoint
 
 }
@@ -460,7 +500,10 @@ void Sensors::loopBMP()
     //bmp.PrintCalibrationData();
     _pressure = bmp.getPressure();
 #ifdef Sensors_temperatureBMP
-    _temperatureBMP = bmp.getTemperature();
+    float temperatureBMP = bmp.getTemperature();
+    if( !isnan(temperatureBMP)) {
+        _temperatureBMP = temperatureBMP;
+    }
 #endif Sensors_temperatureBMP
 }
 #endif Sensors_enableBMP

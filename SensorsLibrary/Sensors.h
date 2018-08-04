@@ -29,7 +29,7 @@
 //#define Sensors_dewPoint
 //#define Sensors_dewPointFast
 //#define Sensors_print
-#define Sendors_status
+#define Sensors_status
 #define Sensors_xbee
 #define Sensors_Relays
 #define Sensors_enableRTC
@@ -38,6 +38,7 @@
 #define Sensors_enableBMP
 #define Sensors_temperatureRTC
 #define Sensors_temperatureBMP
+#define Sensors_reset
 
 #ifdef Sensors_enableTSL
 #include <TSL2561.h>
@@ -68,6 +69,8 @@
 #define SENSORS_TEMPERATURE_BMP_SETUP_BIT   7
 #endif
 
+#define SENSORS_SETUP_RUNS                  5
+
 #define SENSORS_FLOAT_TO_INT_MULTIPLY       100
 
 #define DHTPIN 7
@@ -85,6 +88,10 @@
 #define XBEE_VISIBLE_HEADER         0x0A << 3   // V
 #define XBEE_FULL_HEADER            0x0B << 3   // F
 #define XBEE_PRESSURE_HEADER        0x0C << 3   // P
+
+#ifdef Sensors_reset
+extern void reset();
+#endif
 
 class Sensors
 {
@@ -144,15 +151,18 @@ public:
     void putXBeeDewPoint(ByteBuffer *buffer);
 #endif
 #endif //Sensors_xbee
-#ifdef Sendors_status
+#ifdef Sensors_status
     String getStatus();
 #endif
     
 
 private:
     uint8_t         _id             =   0;
-    uint16_t        _status         =   0x0000;         // SENSORS_STATUS_*
+    uint16_t        _status         =   0x0;            // SENSORS_STATUS_*
     uint8_t         _looper         =   0;
+#ifdef Sensors_reset
+    uint16_t        _save           =   0x0;            // SENSORS_SAVE_STATUS_*
+#endif
 
     unsigned long   _last_run       =   0;
 #ifdef Sensors_enableRTC
