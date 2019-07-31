@@ -6,6 +6,7 @@
 //
 //  Sensors
 //  Created by jeroenjonkman on 22-06-15
+//  Modified by jeroenjonkman on 31-07-19
 //
 
 #ifndef Sensors_h
@@ -73,11 +74,8 @@
 
 #define SENSORS_FLOAT_TO_INT_MULTIPLY       100
 
-#ifndef DHTPIN
-#define DHTPIN                              7
-#endif
-#define DHTRETRY                            3
-#define DHTTYPE                             DHT22   // DHT 22  (AM2302)
+#define DHTPIN 7
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
 
 #define XBEE_TIME_HEADER            0x10
 #define XBEE_SENSOR_HEADER          0x40
@@ -201,8 +199,6 @@ private:
 #endif
 #endif
 #ifdef Sensors_enableDHT
-    float       readTemperature();
-    float       readHumidity();
     void        loopTemperatureDHT();
     void        loopHumidityDHT();
 #endif

@@ -7,18 +7,28 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		0E1438D822F2455D00158E52 /* library.properties */ = {isa = PBXFileReference; lastKnownFileType = text; path = library.properties; sourceTree = "<group>"; };
 		0EF42AAD1B399AB700F2E270 /* rsync.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = rsync.sh; sourceTree = "<group>"; };
-		0EFE94311B3878EF00A3A900 /* Sensors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Sensors.cpp; path = SensorsLibrary/Sensors.cpp; sourceTree = "<group>"; };
-		0EFE94321B3878EF00A3A900 /* Sensors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sensors.h; path = SensorsLibrary/Sensors.h; sourceTree = "<group>"; };
+		0EFE94311B3878EF00A3A900 /* Sensors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sensors.cpp; sourceTree = "<group>"; };
+		0EFE94321B3878EF00A3A900 /* Sensors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sensors.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		0E1438D722F2451600158E52 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				0EFE94311B3878EF00A3A900 /* Sensors.cpp */,
+				0EFE94321B3878EF00A3A900 /* Sensors.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		0E2F6AE71B38782F003DF033 = {
 			isa = PBXGroup;
 			children = (
+				0E1438D822F2455D00158E52 /* library.properties */,
+				0E1438D722F2451600158E52 /* src */,
 				0EF42AAD1B399AB700F2E270 /* rsync.sh */,
-				0EFE94311B3878EF00A3A900 /* Sensors.cpp */,
-				0EFE94321B3878EF00A3A900 /* Sensors.h */,
 			);
 			sourceTree = "<group>";
 		};
